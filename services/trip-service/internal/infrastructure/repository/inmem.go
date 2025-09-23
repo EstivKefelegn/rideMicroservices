@@ -17,6 +17,7 @@ func NewInmemRepository() *inmemRepository  {
 	}
 }
 
+
 func (r *inmemRepository) CreateTrip(ctx context.Context, trip *domain.TripModel) (*domain.TripModel, error)  {
 	r.trips[trip.ID.Hex()] = trip
 	return trip, nil

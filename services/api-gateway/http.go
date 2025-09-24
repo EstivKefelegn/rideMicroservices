@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"log"
 	"net/http"
+	"ride-sharing/shared/contracts"
 )
 
 func handleTripPreview(w http.ResponseWriter, r *http.Request) {
@@ -13,13 +16,32 @@ func handleTripPreview(w http.ResponseWriter, r *http.Request) {
 	}
 
 	defer r.Body.Close()
-	
+
 	// validation
 	if reqBody.UserID == "" {
 		http.Error(w, "User id is required", http.StatusBadRequest)
 		return
 	}
 
+	jsonBody, _ := json.Marshal(reqBody)
+	reader := bytes.NewReader(jsonBody)
+
+
+	resp, err := http.Post("http://trip-service:8083/preview", "application/json", reader)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+
+	defer resp.Body.Close()
+
+	var respBody any
+	if err := json.NewDecoder(resp.Body).Decode(&respBody); err != nil {
+		http.Error(w, "failed to parse JSON data", http.StatusBadRequest)
+		return
+	}
+
+	response := contracts.APIResponse{Data: respBody}
 	// write json
-	WriteJSON(w, http.StatusCreated, "ok")
+	WriteJSON(w, http.StatusCreated, response)
 }

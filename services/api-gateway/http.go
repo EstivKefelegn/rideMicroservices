@@ -9,6 +9,7 @@ import (
 )
 
 func handleTripPreview(w http.ResponseWriter, r *http.Request) {
+
 	var reqBody previewTripRequest
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "failed to parse JSON data", http.StatusBadRequest)
@@ -25,7 +26,6 @@ func handleTripPreview(w http.ResponseWriter, r *http.Request) {
 
 	jsonBody, _ := json.Marshal(reqBody)
 	reader := bytes.NewReader(jsonBody)
-
 
 	resp, err := http.Post("http://trip-service:8083/preview", "application/json", reader)
 	if err != nil {
